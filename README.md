@@ -10,7 +10,7 @@ This service is intentionally designed with strong consistency guarantees and a 
 
 - POST /auth/register
 
-  - body: { "email": "a@b.com", "password": "password123", "name": "Mercy" }
+  - body: { "email": "a@b.com", "password": "password123", "name": "Customer 1" }
 
 - POST /auth/login
 
