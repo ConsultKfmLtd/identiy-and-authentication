@@ -24,7 +24,7 @@ This service is intentionally designed with strong consistency guarantees and a 
 
 ## Setup
 
-- Integrate with prisma to connect with db
+- Integrate with the prisma database
 To run this repository, integration with the [prisma repository](https://github.com/kfmGroups/PartyGbeDecoy/tree/main) is required.
 ```
 npm install git+https://github.com/kfmGroups/PartyGbeDecoy.git#external_repo_integration
