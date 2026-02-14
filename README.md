@@ -22,6 +22,21 @@ This service is intentionally designed with strong consistency guarantees and a 
 
 - POST /auth/logout
 
+## Setup
+
+- Integrate with prisma to connect with db
+To run this repository, integration with the [prisma repository](https://github.com/kfmGroups/PartyGbeDecoy/tree/main) is required.
+```
+npm install git+https://github.com/kfmGroups/PartyGbeDecoy.git#external_repo_integration
+```
+This was the branch with the export prisma functionality
+Or
+```
+ npm install git+https://github.com/kfmGroups/PartyGbeDecoy.git
+```
+Use ONLY after the external_repo_integration has been merged
+
+
 ## Responsibilities
 
 This service is responsible for:
