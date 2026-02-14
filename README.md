@@ -6,6 +6,22 @@ It acts as the authoritative source of truth for user accounts and security-sens
 
 This service is intentionally designed with strong consistency guarantees and a minimal, security-focused surface area.
 
+## API Endpoints
+
+- POST /auth/register
+
+  - body: { "email": "a@b.com", "password": "password123", "name": "Mercy" }
+
+- POST /auth/login
+
+  - body: { "email": "a@b.com", "password": "password123" }
+
+- POST /auth/refresh
+
+  - uses httpOnly cookie refresh_token (or send { refreshToken } in body)
+
+- POST /auth/logout
+
 ## Responsibilities
 
 This service is responsible for:
