@@ -3,6 +3,11 @@ import { registerSchema, loginSchema, refreshSchema } from "../validators/auth.v
 import { registerUser, loginUser, refreshSession, logout } from "../services/auth.service.js";
 import { env } from "../config/env.js";
 
+/*
+  This file contains the controller functions for authentication-related operations, such as registration, login, token refresh, and logout. 
+  Each function handles and validated the corresponding HTTP request, interacts with the service layer to perform the necessary business logic, and sends an appropriate response back to the client. 
+  The controller also manages setting and clearing cookies for refresh tokens when needed.
+*/
 function cookieOptions() {
   return {
     httpOnly: true,
@@ -13,7 +18,6 @@ function cookieOptions() {
   };
 }
 
-// If you prefer storing refresh token in cookie, we do that here.
 // Access token returns in JSON; refresh token in cookie (safer than localStorage).
 
 export async function register(req: Request, res: Response) {

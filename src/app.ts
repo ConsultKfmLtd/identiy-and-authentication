@@ -6,6 +6,9 @@ import { env } from "./config/env.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 
+/*
+  This file sets up the Express application, configures middleware, and defines routes. It is imported by server.ts to start the server.  
+*/
 export const app = express();
 
 app.use(helmet());

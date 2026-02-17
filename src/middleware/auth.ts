@@ -1,6 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 import { verifyAccessToken } from "../lib/jwt.js";
 
+/*
+This runs before the controller on protected routes.
+Read authorisation header and verifies token
+*/
+
 export type AuthedRequest = Request & { user?: { id: string; email: string } };
 
 export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {

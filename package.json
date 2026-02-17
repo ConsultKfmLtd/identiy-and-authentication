@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "@partygbe/db": "github:kfmGroups/PartyGbeDecoy#external_repo_integration",
-    "@prisma/client": "^5.19.1",
+    "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0",
@@ -28,7 +29,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
-    "prisma": "^5.19.1",
+    "prisma": "^5.22.0",
     "tsc-alias": "^1.8.10",
     "tsx": "^4.16.2",
     "typescript": "^5.5.4"

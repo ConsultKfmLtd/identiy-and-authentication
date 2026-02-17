@@ -1,5 +1,9 @@
+import "dotenv/config";
 import { z } from "zod";
 
+/*
+  This file defines the environment variables schema using Zod and exports a validated `env` object. It ensures that all required environment variables are present and have the correct types, providing defaults where applicable.
+*/
 const envSchema = z.object({
   NODE_ENV: z.string().default("development"),
   PORT: z.coerce.number().default(4000),
