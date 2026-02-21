@@ -3,6 +3,7 @@ import { prisma } from "@partygbe/db";
 import { hashPassword, verifyPassword } from "../lib/password.js";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt.js";
 import { env } from "../config/env.js";
+import { v4 as uuidv4 } from "uuid";
 
 function sha256(input: string): string {
   return crypto.createHash("sha256").update(input).digest("hex");
@@ -14,7 +15,7 @@ export async function registerUser(input: { email: string; password: string; use
   console.log("prisma is:", prisma);
   console.log("prisma.users is:", (prisma as any)?.users);
 
-  const existing = await prisma.users.findUnique({ where: { email } });
+  const existing = await prisma.users.findFirst({ where: { email } });
   if (existing) {
     const err: any = new Error("Email already in use");
     err.status = 409;
@@ -26,10 +27,12 @@ export async function registerUser(input: { email: string; password: string; use
 
   const user = await prisma.users.create({
     data: { 
+      id: uuidv4(),
       full_name: "",
-      username: input.username?.trim(),
+      username: input.username?.trim() ?? "",
       email: email,
-      password_hash:passwordHash
+      password_hash:passwordHash,
+      profile_photo_url: ""
     }
   });
 
@@ -47,7 +50,7 @@ export async function registerUser(input: { email: string; password: string; use
   // });
 
   return {
-    user: { id: user.id, email: user.email, name: user.name, createdAt: user.createdAt },
+    user: { id: user.id, email: user.email, name: user.username, createdAt: Date.now() },
     accessToken,
     refreshToken
   };
@@ -56,7 +59,7 @@ export async function registerUser(input: { email: string; password: string; use
 export async function loginUser(input: { email: string; password: string }) {
   const email = input.email.toLowerCase().trim();
 
-  const user = await prisma.users.findUnique({ where: { email } });
+  const user = await prisma.users.findFirst({ where: { email } });
   if (!user) {
     const err: any = new Error("Invalid credentials");
     err.status = 401;
@@ -64,7 +67,7 @@ export async function loginUser(input: { email: string; password: string }) {
     throw err;
   }
 
-  const ok = await verifyPassword(input.password, user.passwordHash);
+  const ok = await verifyPassword(input.password, user.password_hash);
   if (!ok) {
     const err: any = new Error("Invalid credentials");
     err.status = 401;
@@ -85,7 +88,7 @@ export async function loginUser(input: { email: string; password: string }) {
   // });
 
   return {
-    user: { id: user.id, email: user.email, name: user.name, createdAt: user.createdAt },
+    user: { id: user.id, email: user.email, name: user.username, createdAt: user.created_at },
     accessToken,
     refreshToken
   };
@@ -116,7 +119,7 @@ export async function refreshSession(input: { refreshToken: string }) {
   //   data: { revokedAt: new Date() }
   // });
 
-  // const user = await prisma.users.findUnique({ where: { id: decoded.sub } });
+  // const user = await prisma.user.findUnique({ where: { id: decoded.sub } });
   // if (!user) {
   //   const err: any = new Error("User not found");
   //   err.status = 404;

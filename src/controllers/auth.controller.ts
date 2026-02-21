@@ -21,27 +21,41 @@ function cookieOptions() {
 // Access token returns in JSON; refresh token in cookie (safer than localStorage).
 
 export async function register(req: Request, res: Response) {
-  const body = registerSchema.parse(req.body);
-  const result = await registerUser(body);
+  try{
+    const body = registerSchema.parse(req.body);
+    const result = await registerUser(body);
 
-  res.cookie("refresh_token", result.refreshToken, cookieOptions());
+    res.cookie("refresh_token", result.refreshToken, cookieOptions());
 
-  return res.status(201).json({
-    user: result.user,
-    accessToken: result.accessToken
-  });
+    return res.status(201).json({
+      user: result.user,
+      accessToken: result.accessToken
+    });
+  } catch (err: any) {
+    return res.status(err.status ?? 500).json({
+      error: err.code ?? "INTERNAL_ERROR",
+      message: err.message ?? "Something went wrong"
+    });
+  }
 }
 
 export async function login(req: Request, res: Response) {
-  const body = loginSchema.parse(req.body);
-  const result = await loginUser(body);
+  try{
+    const body = loginSchema.parse(req.body);
+    const result = await loginUser(body);
 
-  res.cookie("refresh_token", result.refreshToken, cookieOptions());
+    res.cookie("refresh_token", result.refreshToken, cookieOptions());
 
-  return res.status(200).json({
-    user: result.user,
-    accessToken: result.accessToken
-  });
+    return res.status(200).json({
+      user: result.user,
+      accessToken: result.accessToken
+    });
+  } catch (err: any) {
+    return res.status(err.status ?? 500).json({
+      error: err.code ?? "INTERNAL_ERROR",
+      message: err.message ?? "Something went wrong"
+    });
+  }
 }
 
 export async function refresh(req: Request, res: Response) {

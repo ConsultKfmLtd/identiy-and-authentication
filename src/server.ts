@@ -8,3 +8,11 @@ import "dotenv/config";
 app.listen(env.PORT, () => {
   console.log(`Auth API running on http://localhost:${env.PORT}`);
 });
+
+app.use((err: any, req: any, res: any, _next: any) => {
+  const status = err.status ?? 500;
+  res.status(status).json({
+    error: err.code ?? "INTERNAL_ERROR",
+    message: err.message ?? "Something went wrong"
+  });
+});
