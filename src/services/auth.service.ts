@@ -12,8 +12,6 @@ function sha256(input: string): string {
 export async function registerUser(input: { email: string; password: string; username?: string }) {
   const email = input.email.toLowerCase().trim();
 
-  console.log("prisma is:", prisma);
-  console.log("prisma.users is:", (prisma as any)?.users);
 
   const existing = await prisma.users.findFirst({ where: { email } });
   if (existing) {
