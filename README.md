@@ -37,6 +37,11 @@ Or
 ```
 Use ONLY after the external_repo_integration has been merged
 
+- Run code
+```
+npm run dev
+```
+
 
 ## Responsibilities
 
