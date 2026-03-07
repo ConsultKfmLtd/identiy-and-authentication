@@ -1,7 +1,9 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { registerSchema, loginSchema, refreshSchema } from "../validators/auth.validators.js";
 import { registerUser, loginUser, refreshSession, logout } from "../services/auth.service.js";
 import { env } from "../config/env.js";
+import { changePasswordSchema } from "../validators/auth.validators.js";
+import { changePassword } from "../services/auth.service.js";
 
 /*
   This file contains the controller functions for authentication-related operations, such as registration, login, token refresh, and logout. 
@@ -75,4 +77,19 @@ export async function logoutHandler(req: Request, res: Response) {
 
   res.clearCookie("refresh_token", { path: "/" });
   return res.status(204).send();
+}
+
+export async function changePasswordHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const body = changePasswordSchema.parse(req.body);
+    const result = await changePassword(body);
+
+    return res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
 }
