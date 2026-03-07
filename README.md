@@ -16,12 +16,10 @@ This service is intentionally designed with strong consistency guarantees and a 
 
   - body: { "email": "a@b.com", "password": "password123" }
 
-- POST /auth/refresh
-
-  - uses httpOnly cookie refresh_token (or send { refreshToken } in body)
-
-- POST /auth/logout
-
+- POST /auth/change-password
+  - body: {"email": "a@b.com", "oldPassword": "oldPassword123" "newPassword": "newPassword456"} 
+  (to be updated to ensure user is logged in and use their authenticated username to avoid someone trying to change another user’s password by supplying a different email. This can only be done after token is completed)
+ 
 ## Setup
 
 - Integrate with the prisma database:

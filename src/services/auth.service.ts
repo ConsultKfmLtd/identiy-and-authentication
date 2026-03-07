@@ -2,7 +2,6 @@ import crypto from "crypto";
 import { prisma } from "@partygbe/db";
 import { hashPassword, verifyPassword } from "../lib/password.js";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/jwt.js";
-import { env } from "../config/env.js";
 import { v4 as uuidv4 } from "uuid";
 
 function sha256(input: string): string {
@@ -38,14 +37,6 @@ export async function registerUser(input: { email: string; password: string; use
   const refreshToken = signRefreshToken({ sub: user.id });
 
   const refreshTokenHash = sha256(refreshToken);
-  // TODO: create prisma model for refresh token
-  // await prisma.refreshToken.create({
-  //   data: {
-  //     tokenHash: refreshTokenHash,
-  //     userId: user.id,
-  //     expiresAt: new Date(Date.now() + env.REFRESH_TOKEN_TTL_SECONDS * 1000)
-  //   }
-  // });
 
   return {
     user: { id: user.id, email: user.email, name: user.username, createdAt: Date.now() },
@@ -77,13 +68,6 @@ export async function loginUser(input: { email: string; password: string }) {
   const refreshToken = signRefreshToken({ sub: user.id });
 
   const refreshTokenHash = sha256(refreshToken);
-  // await prisma.refreshToken.create({
-  //   data: {
-  //     tokenHash: refreshTokenHash,
-  //     userId: user.id,
-  //     expiresAt: new Date(Date.now() + env.REFRESH_TOKEN_TTL_SECONDS * 1000)
-  //   }
-  // });
 
   return {
     user: { id: user.id, email: user.email, name: user.username, createdAt: user.created_at },
@@ -96,56 +80,65 @@ export async function refreshSession(input: { refreshToken: string }) {
   const decoded = verifyRefreshToken(input.refreshToken);
   const tokenHash = sha256(input.refreshToken);
 
-  // const stored = await prisma.refreshToken.findUnique({ where: { tokenHash } });
-  // if (!stored || stored.revokedAt) {
-  //   const err: any = new Error("Refresh token invalid");
-  //   err.status = 401;
-  //   err.code = "INVALID_REFRESH_TOKEN";
-  //   throw err;
-  // }
-
-  // if (stored.expiresAt.getTime() < Date.now()) {
-  //   const err: any = new Error("Refresh token expired");
-  //   err.status = 401;
-  //   err.code = "EXPIRED_REFRESH_TOKEN";
-  //   throw err;
-  // }
-
-  // // Optional: rotate refresh tokens (recommended)
-  // await prisma.refreshToken.update({
-  //   where: { tokenHash },
-  //   data: { revokedAt: new Date() }
-  // });
-
-  // const user = await prisma.user.findUnique({ where: { id: decoded.sub } });
-  // if (!user) {
-  //   const err: any = new Error("User not found");
-  //   err.status = 404;
-  //   err.code = "USER_NOT_FOUND";
-  //   throw err;
-  // }
-
-  // const accessToken = signAccessToken({ sub: user.id, email: user.email });
-  // const newRefreshToken = signRefreshToken({ sub: user.id });
-
-  // await prisma.refreshToken.create({
-  //   data: {
-  //     tokenHash: sha256(newRefreshToken),
-  //     userId: user.id,
-  //     expiresAt: new Date(Date.now() + env.REFRESH_TOKEN_TTL_SECONDS * 1000)
-  //   }
-  // });
-
   return { accessToken: "newAccessToken", refreshToken: "newRefreshToken" };
 }
 
 export async function logout(input: { refreshToken: string }) {
   const tokenHash = sha256(input.refreshToken);
-  // const stored = await prisma.refreshToken.findUnique({ where: { tokenHash } });
-  // if (!stored) return;
+}
 
-  // await prisma.refreshToken.update({
-  //   where: { tokenHash },
-  //   data: { revokedAt: new Date() }
-  // });
+export async function changePassword(input: {
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}) {
+  const email = input.email.toLowerCase().trim();
+
+  const user = await prisma.users.findFirst({
+    where: { email }
+  });
+
+  if (!user) {
+    const err: any = new Error("Invalid email or password");
+    err.status = 400;
+    err.code = "INVALID_CREDENTIALS";
+    throw err;
+  }
+
+  const oldPasswordMatches = await verifyPassword(
+    input.oldPassword,
+    user.password_hash
+  );
+
+  if (!oldPasswordMatches) {
+    const err: any = new Error("Old password is incorrect");
+    err.status = 400;
+    err.code = "INVALID_UPDATE_PASSWORD";
+    throw err;
+  }
+
+  const samePassword = await verifyPassword(
+    input.newPassword,
+    user.password_hash
+  );
+
+  if (samePassword) {
+    const err: any = new Error("New password must be different from old password");
+    err.status = 400;
+    err.code = "PASSWORD_UNCHANGED";
+    throw err;
+  }
+
+  const newPasswordHash = await hashPassword(input.newPassword);
+
+  await prisma.users.update({
+    where: { id: user.id },
+    data: {
+      password_hash: newPasswordHash
+    }
+  });
+
+  return {
+    message: "Password updated successfully"
+  };
 }
